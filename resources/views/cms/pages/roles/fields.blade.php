@@ -3,11 +3,15 @@
 <div class="mb-3">
     <label for="name" class="form-label">Role Name</label>
     <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror"
-        value="{{ old('name', @$role->name) }}" placeholder="Enter role name" required>
+        value="{{ old('name', @$role->name) }}" placeholder="Enter role name" required {{ isset($role) && $role->name === 'Admin' ? 'readonly' : '' }}>
 
     @error('name')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror
+
+    @if(isset($role) && $role->name === 'Admin')
+        <small class="text-muted">The Admin role name cannot be changed.</small>
+    @endif
 </div>
 
 

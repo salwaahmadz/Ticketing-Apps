@@ -42,4 +42,14 @@ class General
 
         return $user->is_active == 1;
     }
+
+    /**
+     * Generate ticket code
+     *
+     * @return string
+     */
+    public static function generateTicketCode()
+    {
+        return 'TCK-' . strtoupper(self::generateRandomString(8));
+    }
 }

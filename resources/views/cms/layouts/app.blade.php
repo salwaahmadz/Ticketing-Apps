@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base App | @yield('title', 'CMS')</title>
+    <title>Ticketing App | @yield('title', 'CMS')</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,7 +33,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="{{ route('dashboard.index') }}">Base App CMS</a>
+            <a class="navbar-brand fw-bold text-primary" href="{{ route('dashboard.index') }}">Ticketing App</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,13 +42,29 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('dashboard.index') }}">Dashboard</a>
+                    </li>
                     @if (
-                            (auth()->user()->roles->isNotEmpty() && @auth()->user()->roles[0]->name == 'Admin') ||
+                            (auth()->user()->roles->isNotEmpty() && auth()->user()->roles[0]->name == 'Admin') ||
                             auth()->user()->canany([
                                 'users-read',
                                 'roles-read',
+                                'tickets-read',
                             ])
                         )
+                        @can('tickets-read')
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('tickets.index') }}">
+                                    @if (auth()->user()->roles->isNotEmpty() && auth()->user()->roles[0]->name == 'Admin')
+                                        Tickets
+                                    @else
+                                        MyTickets
+                                    @endif
+                                </a>
+                            </li>
+                        @endcan
+
                         @can('users-read')
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('users.index') }}">Users</a>
@@ -60,7 +76,6 @@
                                 <a class="nav-link" href="{{ route('roles.index') }}">Roles</a>
                             </li>
                         @endcan
-                        </li>
                     @endif
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('users.profile', Auth::user()->uuid) }}">Profile</a>

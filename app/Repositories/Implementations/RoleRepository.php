@@ -268,24 +268,50 @@ class RoleRepository implements RoleRepositoryInterface
     {
         $permissions = [];
 
-        // Get all permission groups
-        $permissionGroups = Permission::selectRaw('MIN(id) as id, grouping')
-            ->orderBy('id', 'asc')
-            ->groupBy('grouping')
-            ->get();
+        // Get all permissions
+        $allPermissions = Permission::orderBy('name', 'asc')->get();
 
-        // Pre-fetch all permissions grouped by grouping to reduce queries
-        $allPermissions = Permission::orderBy('grouping', 'asc')
-            ->orderBy('sorting', 'asc')
-            ->get()
-            ->groupBy('grouping');
+        // Group permissions by module (e.g., 'users', 'roles', 'tickets')
+        $groupedPermissions = [];
 
-        foreach ($permissionGroups as $key => $group) {
-            $groupName = $group->grouping;
+        foreach ($allPermissions as $permission) {
+            // Extract group from permission name (e.g., 'users-read' -> 'users')
+            $parts = explode('-', $permission->name);
+            $module = $parts[0] ?? 'other';
+
+            if (!isset($groupedPermissions[$module])) {
+                $groupedPermissions[$module] = [];
+            }
+
+            $groupedPermissions[$module][] = $permission;
+        }
+
+        // Sort modules and ensure order: users, roles, tickets, others
+        $sortOrder = ['users' => 1, 'roles' => 2, 'tickets' => 3];
+        uksort($groupedPermissions, function ($a, $b) use ($sortOrder) {
+            $orderA = $sortOrder[$a] ?? 999;
+            $orderB = $sortOrder[$b] ?? 999;
+            if ($orderA === $orderB) {
+                return strcmp($a, $b);
+            }
+            return $orderA - $orderB;
+        });
+
+        // Format for view
+        foreach ($groupedPermissions as $module => $perms) {
+            // Sort permissions within each module: read, create, update, delete
+            $order = ['read' => 1, 'create' => 2, 'update' => 3, 'delete' => 4];
+            usort($perms, function ($a, $b) use ($order) {
+                $typeA = explode('-', $a->name)[1] ?? 'zzz';
+                $typeB = explode('-', $b->name)[1] ?? 'zzz';
+                $orderA = $order[$typeA] ?? 999;
+                $orderB = $order[$typeB] ?? 999;
+                return $orderA - $orderB;
+            });
 
             $permissions[] = [
-                'group' => $groupName,
-                'list' => $allPermissions[$groupName] ?? collect(),
+                'group' => ucfirst($module),
+                'list' => collect($perms),
             ];
         }
 

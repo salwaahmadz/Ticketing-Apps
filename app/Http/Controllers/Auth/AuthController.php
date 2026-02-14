@@ -30,6 +30,9 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:8'
+        ], [
+            'email.required' => 'Email is required',
+            'password.required' => 'Passwrd is required'
         ]);
 
         $result = $this->authRepository->login($request->all());

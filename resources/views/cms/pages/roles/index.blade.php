@@ -36,7 +36,7 @@
                             <th scope="col">Name</th>
                             <th scope="col" class="text-center">Users Count</th>
                             @if (
-                                    (auth()->user()->roles->isNotEmpty() && @auth()->user()->roles[0]->name == 'Admin') ||
+                                    (auth()->user()->roles->isNotEmpty() && auth()->user()->roles[0]->name == 'Admin') ||
                                     auth()->user()->canany([
                                         'roles-update',
                                         'roles-delete',
@@ -53,7 +53,7 @@
                                     <td class="fw-semibold">{{ $role->name }}</td>
                                     <td class="text-center">{{ $role->users_count ?? 0 }}</td>
                                     @if (
-                                            (auth()->user()->roles->isNotEmpty() && @auth()->user()->roles[0]->name == 'Admin') ||
+                                            (auth()->user()->roles->isNotEmpty() && auth()->user()->roles[0]->name == 'Admin') ||
                                             auth()->user()->canany([
                                                 'roles-update',
                                                 'roles-delete',
@@ -68,13 +68,15 @@
                                                 @endcan
 
                                                 @can('roles-delete')
-                                                    <form action="{{ route('roles.destroy', $role->uuid) }}" method="POST">
-                                                        @csrf
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                            onclick="return confirm('Are you sure you want to delete this role?')">
-                                                            Delete
-                                                        </button>
-                                                    </form>
+                                                    @if($role->name !== 'Admin')
+                                                        <form action="{{ route('roles.destroy', $role->uuid) }}" method="POST">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                onclick="return confirm('Are you sure you want to delete this role?')">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    @endif
                                                 @endcan
                                             </div>
                                         </td>

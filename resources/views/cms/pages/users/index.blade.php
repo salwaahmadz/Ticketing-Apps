@@ -38,7 +38,7 @@
                             <th scope="col">Role</th>
                             <th scope="col" class="text-center">Status</th>
                             @if (
-                                    (auth()->user()->roles->isNotEmpty() && @auth()->user()->roles[0]->name == 'Admin') ||
+                                    (auth()->user()->roles->isNotEmpty() && auth()->user()->roles[0]->name == 'Admin') ||
                                     auth()->user()->canany([
                                         'users-update',
                                         'users-delete',
@@ -71,7 +71,7 @@
                                     </td>
 
                                     @if (
-                                            (auth()->user()->roles->isNotEmpty() && @auth()->user()->roles[0]->name == 'Admin') ||
+                                            (auth()->user()->roles->isNotEmpty() && auth()->user()->roles[0]->name == 'Admin') ||
                                             auth()->user()->canany([
                                                 'users-update',
                                                 'users-delete',
